@@ -13,7 +13,7 @@ import torch.optim as optim
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--dataset', default='last_fm')
+    parser.add_argument('--dataset', default='nowplaying')
     parser.add_argument('--top_k', default=10, type=int)
     
     parser.add_argument('--train_dir', default='default')
@@ -22,19 +22,19 @@ if __name__ == '__main__':
 
     parser.add_argument('--maxlen', default=30, type=int)
 
-    parser.add_argument('--embed_dim', default=200, type=int) 
-    parser.add_argument('--ffn_embed_dim', default=200, type=int)
-    parser.add_argument('--dropout', default=0.2, type=float) 
-    parser.add_argument('--weight_dropout', default=0.2, type=float)
+    parser.add_argument('--embed_dim', default=512, type=int) 
+    parser.add_argument('--ffn_embed_dim', default=512, type=int)
+    parser.add_argument('--dropout', default=0.0, type=float) 
+    parser.add_argument('--weight_dropout', default=0.0, type=float)
 
 
     parser.add_argument('--layers', default=2, type=int) 
     parser.add_argument('--heads', default=1, type=int) 
 
-    parser.add_argument('--decoder_kernel_size_list', default = [5, 5]) #depends on the number of layer
+    parser.add_argument('--decoder_kernel_size_list', default = [3, 5]) #depends on the number of layer
     
-    parser.add_argument('--num_epochs', default=30, type=int)
-    parser.add_argument('--num_neg_samples', default = 400, type=int) #Note: 100 is sufficient
+    parser.add_argument('--num_epochs', default=60, type=int)
+    parser.add_argument('--num_neg_samples', default = 1024, type=int) #Note: 100 is sufficient
     parser.add_argument('--eval_epoch', default = 5, type=int)
     
     # Check if your system supports CUDA

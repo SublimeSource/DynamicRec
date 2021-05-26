@@ -82,7 +82,7 @@ class DynamicConv1dTBC(nn.Module):
         self.weight_softmax = weight_softmax
         self.renorm_padding = renorm_padding
         self.unfold = unfold
-        self.weight_linear = Linear(self.query_size, num_heads * kernel_size * 1, bias=bias) 
+        self.weight_linear = nn.LSTM(self.query_size, self.query_size * kernel_size * 1, bias=bias) 
 
         if conv_bias:
             self.conv_bias = nn.Parameter(torch.Tensor(input_size))
@@ -128,25 +128,26 @@ class DynamicConv1dTBC(nn.Module):
         assert R * H == C == self.input_size
 
         
-        weight = self.weight_linear(query).view(T*B*H, -1) 
+        weight = self.weight_linear(query)[0].view(T*B*H, -1, self.kernel_size) 
         
         weight = F.dropout(weight, self.weight_dropout, training=self.training, inplace=False)
 
 
         padding_l = self.padding_l
-        if K > T and padding_l == K-1:
-            weight = weight.narrow(1, K-T, T)
-            K, padding_l = T, T-1
+        # if K > T and padding_l == K-1:
+        #     weight = weight.narrow(1, K-T, T)
+        #     K, padding_l = T, T-1
         # unfold the input: T x B x C --> T' x B x C x K
         x_unfold = unfold1d(x, K, padding_l, 0)
         x_unfold = x_unfold.view(T*B*H, R, K)
 
         if self.weight_softmax:
-            weight = F.softmax(weight, dim=1)
+            weight = F.softmax(weight, dim=-1)
             
-        weight = weight.narrow(1, 0, K)
+        # weight = weight.narrow(1, 0, K)
       
-        output = torch.bmm(x_unfold, weight.unsqueeze(2)) # T*B*H x R x 1
+        # output = torch.bmm(x_unfold, weight.unsqueeze(2)) # T*B*H x R x 1
+        output = torch.einsum('bck, bck->bc', x_unfold, weight)
         output = output.view(T, B, C)
         return output
 
