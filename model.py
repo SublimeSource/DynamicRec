@@ -103,7 +103,7 @@ class ConvRecLayer(nn.Module):
         self.conv = DynamicConv1dTBC(args.embed_dim, kernel_size, padding_l=kernel_size-1,
                                          weight_softmax=args.weight_softmax,
                                          num_heads=args.heads,
-                                         unfold = None, 
+                                         unfold = None, bias=True, conv_bias=True,
                                          weight_dropout=args.weight_dropout)
         
         self.dropout = args.dropout
